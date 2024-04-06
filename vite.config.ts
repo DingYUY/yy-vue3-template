@@ -6,7 +6,7 @@ import VueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vitejs.dev/config/
 export default ({ mode }: ConfigEnv): UserConfigExport => {
-  const env = loadEnv(mode, process.cwd()) as ImportMetaEnv
+  const env = loadEnv(mode, process.cwd())
   const { VITE_PUBLIC_PATH } = env
   return {
     base: VITE_PUBLIC_PATH,
@@ -45,7 +45,7 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
       },
       /** 预热常用文件，提高初始页面加载速度 */
       warmup: {
-        clientFiles: ['./src/layouts/**/*.vue']
+        clientFiles: ['./src/layout/**/*.vue']
       }
     },
     build: {
