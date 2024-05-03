@@ -1,7 +1,11 @@
 import { type ConfigEnv, type UserConfigExport, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import VueDevTools from 'vite-plugin-vue-devtools'
-import { resolve } from 'path'
+import vueJsx from '@vitejs/plugin-vue-jsx'
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import svgLoader from 'vite-svg-loader'
+import UnoCSS from 'unocss/vite'
+import path, { resolve } from 'path'
 
 // https://vitejs.dev/config/
 export default ({ mode }: ConfigEnv): UserConfigExport => {
@@ -9,10 +13,23 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
   const { VITE_PUBLIC_PATH } = env
   return {
     base: VITE_PUBLIC_PATH,
-    plugins: [vue(), VueDevTools()],
+    plugins: [
+      vue(),
+      VueDevTools(),
+      vueJsx(),
+      /** 将 SVG 静态图转化为 Vue 组件 */
+      svgLoader({ defaultImport: 'url' }),
+      /** SVG */
+      createSvgIconsPlugin({
+        iconDirs: [path.resolve(process.cwd(), 'src/icons/svg')],
+        symbolId: 'icon-[dir]-[name]'
+      }),
+      /** UnoCSS */
+      UnoCSS()
+    ],
     resolve: {
       alias: {
-        '@': resolve(__dirname, 'src')
+        '@': resolve(__dirname, './src')
       }
     },
     css: {
@@ -62,7 +79,8 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
            * 2. 如果你不想自定义 chunk 分割策略，可以直接移除这段配置
            */
           manualChunks: {
-            vue: ['vue', 'vue-router', 'pinia']
+            vue: ['vue', 'vue-router', 'pinia'],
+            element: ['element-plus', '@element-plus/icons-vue']
           }
         }
       }
@@ -78,6 +96,10 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
             drop: ['debugger'],
             /** 打包时移除所有注释 */
             legalComments: 'none'
-          }
+          },
+    test: {
+      include: ['tests/**/*.test.ts'],
+      environment: 'jsdom'
+    }
   }
 }
